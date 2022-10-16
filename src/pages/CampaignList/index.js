@@ -26,8 +26,6 @@ export const CampaignList = () => {
   const campaign = useSelector((state) => state.campaign);
   const dispatch = useDispatch();
 
-  console.log(campaign)
-
   const {
     data: campaignList,
     isLoading: isGetCampaignListLoading,
