@@ -1,7 +1,7 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
-import { useGetSubjNameMutation } from "../../../../redux/api/articles";
+import { useGetSubjNameQuery } from "../../../../redux/api/articles";
 
 import {
   Box,
@@ -15,6 +15,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 
 import {
@@ -172,22 +174,13 @@ const Row = ({ row }) => {
 };
 
 export const SortedArticleTable = ({ rows }) => {
-  const [
-    getSubjName,
-    {
+  const {
       data: subjNameData,
       isLoading: isGetSubjNameLoading,
       isSuccess: isGetSubjNameSuccess,
-    },
-  ] = useGetSubjNameMutation();
+    } = useGetSubjNameQuery();
 
   const [campaigns, setCampaigns] = useState([]);
-
-  useEffect(() => {
-    const articles = removeArrayDuplicates(rows.map(({ nms }) => nms).flat(1));
-
-    getSubjName({ articles });
-  }, []);
 
   useEffect(() => {
     if (!isGetSubjNameSuccess) return;
@@ -244,6 +237,18 @@ export const SortedArticleTable = ({ rows }) => {
             campaigns.map((row, index) => <Row key={index} row={row} />)}
         </TableBody>
       </Table>
+
+      <Backdrop
+        sx={{
+          position: "absolute",
+          backgroundColor: "#8c8c8c80",
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={isGetSubjNameLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </CustomizedTableContainer>
   );
 };

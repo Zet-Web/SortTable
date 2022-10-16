@@ -13,6 +13,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 
 import {
@@ -202,6 +204,18 @@ export const SortedAdvertsTable = ({ rows }) => {
             campaigns.map((row, index) => <Row key={index} row={row} />)}
         </TableBody>
       </Table>
+
+      <Backdrop
+        sx={{
+          position: "absolute",
+          backgroundColor: "#8c8c8c80",
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={rows.length === 0}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </CustomizedTableContainer>
   );
 };

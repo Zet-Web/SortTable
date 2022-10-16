@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { useGetCountQuery, useGetListQuery } from "../../redux/api/campaigns";
 import { setCount, setList } from "../../redux/slices/Edit/campaign";
 
-import { Backdrop, CircularProgress, ToggleButton } from "@mui/material";
+import { Backdrop, CircularProgress, ToggleButton,  } from "@mui/material";
+import { LoadingButton } from "@mui/lab";
 
 import {
   CustomizedToggleButtonGroup,
@@ -24,6 +25,8 @@ import { getStatusNameById, getTypeNameById } from "./helpers";
 export const CampaignList = () => {
   const campaign = useSelector((state) => state.campaign);
   const dispatch = useDispatch();
+
+  console.log(campaign)
 
   const {
     data: campaignList,
@@ -59,6 +62,7 @@ export const CampaignList = () => {
 
   const [sort, setSort] = useState(false);
   const [statusFilter, setStatusFilter] = useState("total");
+
 
   const setSortHandler = (_, sort) => setSort(sort);
   const setStatusFilterHandler = (_, status) => setStatusFilter(status);
@@ -97,18 +101,36 @@ export const CampaignList = () => {
                   exclusive
                   onChange={setStatusFilterHandler}
                 >
-                  <ToggleButton value="total">
-                    Все ({campaign.count.total})
-                  </ToggleButton>
-                  <ToggleButton value="active">
-                    Активные ({campaign.count.active})
-                  </ToggleButton>
-                  <ToggleButton value="pause">
-                    Остановленные ({campaign.count.pause})
-                  </ToggleButton>
-                  <ToggleButton value="archive">
-                    Архив ({campaign.count.archive})
-                  </ToggleButton>
+                  {isGetCampaignListLoading ? (
+                    <LoadingButton sx={{height: '48px'}} loading variant="outlined">
+                      Все
+                    </LoadingButton>
+                  ) : (
+                    <ToggleButton size='medium'  value="total">Все ({campaign.count.total})</ToggleButton>
+                  )}
+
+                  {isGetCampaignListLoading ?
+                    <LoadingButton sx={{height: '48px'}} size='medium' loading variant="outlined">
+                      Активные
+                    </LoadingButton>
+                   : <ToggleButton value="active">Активные ({campaign.count.active}) </ToggleButton>
+                  }
+
+                  {isGetCampaignListLoading ? (
+                    <LoadingButton sx={{height: '48px'}} size='medium' loading variant="outlined">
+                      Остановленные
+                    </LoadingButton>
+                  ) : (
+                    <ToggleButton value="pause">Остановленные ({campaign.count.pause})</ToggleButton>
+                  )}
+
+                  {isGetCampaignListLoading ? (
+                    <LoadingButton sx={{height: '48px'}} size='medium' loading variant="outlined">
+                      Архив
+                    </LoadingButton>
+                  ) : (
+                    <ToggleButton value="archive">Архив ({campaign.count.archive})</ToggleButton>
+                  )}
                 </CustomizedToggleButtonGroup>
               </div>
             </div>
@@ -128,7 +150,12 @@ export const CampaignList = () => {
                 )}
               </div>
             ) : (
-              <DataTable rows={campaign.list} />
+              <>
+                {statusFilter === 'total' && <DataTable rows={campaign.list} />}
+                {statusFilter === 'active' && <DataTable rows={campaign.list.filter(item => item.statusId === "Активна")} />}
+                {statusFilter === 'pause' && <DataTable rows={campaign.list.filter(item => item.statusId === "Приостановлено")} />}
+                {statusFilter === 'archive' && <DataTable rows={campaign.list.filter(item => item.statusId === "Показы завершены")} />}
+              </>
             )}
 
             <Backdrop
@@ -138,7 +165,7 @@ export const CampaignList = () => {
                 color: "#fff",
                 zIndex: (theme) => theme.zIndex.drawer + 1,
               }}
-              open={false}
+              open={isGetCampaignsCountLoading}
             >
               <CircularProgress color="inherit" />
             </Backdrop>

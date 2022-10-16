@@ -13,6 +13,8 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Backdrop,
+  CircularProgress,
 } from "@mui/material";
 
 import {
@@ -36,7 +38,7 @@ import {
   roundNumber,
 } from "../../../../utils";
 
-import { useGetSubjNameMutation } from "../../../../redux/api/articles";
+import { useGetSubjNameQuery } from "../../../../redux/api/articles";
 
 const CustomizedTableContainer = styled(TableContainer)({
   ".MuiTable-root th, .MuiTable-root td": {
@@ -166,22 +168,13 @@ const Row = ({ row }) => {
 };
 
 export const SortedSubjTable = ({ rows }) => {
-  const [
-    getSubjName,
-    {
+  const {
       data: subjNameData,
       isLoading: isGetSubjNameLoading,
       isSuccess: isGetSubjNameSuccess,
-    },
-  ] = useGetSubjNameMutation();
+    } = useGetSubjNameQuery();
 
   const [campaigns, setCampaigns] = useState([]);
-
-  useEffect(() => {
-    const articles = removeArrayDuplicates(rows.map(({ nms }) => nms).flat(1));
-
-    getSubjName({ articles });
-  }, [rows]);
 
   useEffect(() => {
     if (!isGetSubjNameSuccess) return;
@@ -248,6 +241,18 @@ export const SortedSubjTable = ({ rows }) => {
             campaigns.map((row, index) => <Row key={index} row={row} />)}
         </TableBody>
       </Table>
+
+      <Backdrop
+        sx={{
+          position: "absolute",
+          backgroundColor: "#8c8c8c80",
+          color: "#fff",
+          zIndex: (theme) => theme.zIndex.drawer + 1,
+        }}
+        open={isGetSubjNameLoading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </CustomizedTableContainer>
   );
 };

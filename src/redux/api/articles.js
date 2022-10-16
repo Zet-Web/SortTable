@@ -8,7 +8,7 @@ export const articlesApi = createApi({
   reducerPath: "articlesApi",
   baseQuery: fetchBaseQuery({ baseUrl: `${BASE_API_URL}/mocks/` }),
   endpoints: (builder) => ({
-    getSubjName: builder.mutation({
+    getSubjName: builder.query({
       query: () => ({
         url: "subjName",
         params: getQueryParams(),
@@ -17,4 +17,4 @@ export const articlesApi = createApi({
   }),
 });
 
-export const { useGetSubjNameMutation } = articlesApi;
+export const { useGetSubjNameQuery } = articlesApi;
