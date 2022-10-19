@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -16,6 +17,8 @@ import {
   Backdrop,
   CircularProgress,
 } from "@mui/material";
+
+import { DataTable } from '../../../../components/DataTable'
 
 import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
@@ -81,7 +84,7 @@ const Row = ({ row }) => {
         <TableCell style={{ padding: 0 }} colSpan={11}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box>
-              <Table size="small">
+              {/* <Table size="small">
                 <TableHead>
                   <TableRow>
                     <TableCell>Статус</TableCell>
@@ -148,7 +151,9 @@ const Row = ({ row }) => {
                     </TableRow>
                   ))}
                 </TableBody>
-              </Table>
+              </Table> */}
+
+              <DataTable rows={row.campaigns}/>
             </Box>
           </Collapse>
         </TableCell>
@@ -159,6 +164,8 @@ const Row = ({ row }) => {
 
 export const SortedAdvertsTable = ({ rows }) => {
   const [campaigns, setCampaigns] = useState([]);
+  const { text } = useSelector(state => state.search)
+
 
   useEffect(() => {
     const advertsType = removeArrayDuplicates(
@@ -201,7 +208,7 @@ export const SortedAdvertsTable = ({ rows }) => {
         </TableHead>
         <TableBody>
           {campaigns &&
-            campaigns.map((row, index) => <Row key={index} row={row} />)}
+            campaigns.filter(el => el.advertType.toString().toLowerCase().includes(text.toLowerCase())).map((row, index) => <Row key={index} row={row} />)}
         </TableBody>
       </Table>
 

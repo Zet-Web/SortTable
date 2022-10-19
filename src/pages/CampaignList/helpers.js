@@ -30,7 +30,7 @@ export const getStatusNameById = (type) => {
     case 11:
       return "Приостановлено";
     default:
-      return type;
+      return '';
   }
 };
 

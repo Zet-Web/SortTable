@@ -23,8 +23,9 @@ import {
 import { getStatusNameById, getTypeNameById } from "./helpers";
 
 export const CampaignList = () => {
-  const campaign = useSelector((state) => state.campaign);
   const dispatch = useDispatch();
+  
+  const campaign = useSelector((state) => state.campaign);
 
   const {
     data: campaignList,
@@ -46,7 +47,7 @@ export const CampaignList = () => {
         campaignList.map((item) => ({
           ...item,
           Type: getTypeNameById(item.Type),
-          statusId: getStatusNameById(item.statusId),
+          statusId: item.statusId,
         }))
       )
     );
@@ -64,6 +65,25 @@ export const CampaignList = () => {
 
   const setSortHandler = (_, sort) => setSort(sort);
   const setStatusFilterHandler = (_, status) => setStatusFilter(status);
+
+
+
+  const getFilteredCompaigns = (list, statusFilter) => {
+    const filteredList = list.filter(item => {
+      switch (statusFilter) {
+        case "total":
+          return item
+        case "active":
+          return item.statusId === 9
+        case "pause":
+          return item.statusId === 11
+        case "archive":
+          return item.statusId === 7
+      }
+    })
+
+    return filteredList.map(item => ({...item, statusId: getStatusNameById(item.statusId)}))
+  }
 
   return (
     <div className="campaign-list">
@@ -148,12 +168,7 @@ export const CampaignList = () => {
                 )}
               </div>
             ) : (
-              <>
-                {statusFilter === 'total' && <DataTable rows={campaign.list} />}
-                {statusFilter === 'active' && <DataTable rows={campaign.list.filter(item => item.statusId === "Активна")} />}
-                {statusFilter === 'pause' && <DataTable rows={campaign.list.filter(item => item.statusId === "Приостановлено")} />}
-                {statusFilter === 'archive' && <DataTable rows={campaign.list.filter(item => item.statusId === "Показы завершены")} />}
-              </>
+              <DataTable rows={getFilteredCompaigns(campaign.list, statusFilter)} />
             )}
 
             <Backdrop

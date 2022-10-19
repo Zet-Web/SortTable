@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSelector } from 'react-redux'
 
 import {
   Box,
@@ -16,6 +17,8 @@ import {
   Backdrop,
   CircularProgress,
 } from "@mui/material";
+
+import { DataTable } from '../../../../components/DataTable'
 
 import {
   KeyboardArrowDown as KeyboardArrowDownIcon,
@@ -51,7 +54,6 @@ const CustomizedTableContainer = styled(TableContainer)({
 
 const Row = ({ row }) => {
   const navigate = useNavigate();
-
   const [open, setOpen] = useState(false);
   return (
     <Fragment>
@@ -87,78 +89,7 @@ const Row = ({ row }) => {
         <TableCell style={{ padding: 0 }} colSpan={11}>
           <Collapse in={open} timeout="auto" unmountOnExit>
             <Box>
-              <Table size="small">
-                <TableHead>
-                  <TableRow>
-                    <TableCell>Артикулов</TableCell>
-                    <TableCell>Статус</TableCell>
-                    <TableCell>Вид рекламы</TableCell>
-                    <TableCell>Название</TableCell>
-                    <TableCell>Ставка (CPM, ₽)</TableCell>
-                    <TableCell>Показы</TableCell>
-                    <TableCell>Клики</TableCell>
-                    <TableCell>CTR</TableCell>
-                    <TableCell>Ср. цена клика</TableCell>
-                    <TableCell>Потрачено</TableCell>
-                    <TableCell>Продаж</TableCell>
-                    <TableCell>Цена цели</TableCell>
-                  </TableRow>
-                </TableHead>
-
-                <TableBody>
-                  {row.campaigns.map((row, index) => (
-                    <TableRow
-                      key={index}
-                      onClick={() => navigate(`/edit/${row.Id}`)}
-                    >
-                      <TableCell component="th" scope="row">
-                        {row.nms.length}
-                      </TableCell>
-                      <TableCell>{getStatusNameById(row.statusId)}</TableCell>
-                      <TableCell>{getTypeNameById(row.Type)}</TableCell>
-                      <TableCell>{row.CampaignName}</TableCell>
-                      <TableCell>
-                        {!isUndefined(row.Cpm)
-                          ? formatPrice(Math.ceil(row.Cpm))
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.Views) ? formatPrice(row.Views) : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.Clicks)
-                          ? formatPrice(row.Clicks)
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.Ctr)
-                          ? formatPrice(roundNumber(row.Ctr, 2))
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.Cpc)
-                          ? formatPrice(Math.ceil(row.Cpc))
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.spent)
-                          ? formatPrice(Math.ceil(row.spent))
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.orders)
-                          ? formatPrice(row.orders)
-                          : "-"}
-                      </TableCell>
-                      <TableCell>
-                        {!isUndefined(row.target)
-                          ? formatPrice(Math.ceil(row.target))
-                          : "-"}
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <DataTable rows={row.campaigns}/>
             </Box>
           </Collapse>
         </TableCell>
@@ -174,7 +105,10 @@ export const SortedSubjTable = ({ rows }) => {
       isSuccess: isGetSubjNameSuccess,
     } = useGetSubjNameQuery();
 
+  const { text } = useSelector((state) => state.search);
+
   const [campaigns, setCampaigns] = useState([]);
+
 
   useEffect(() => {
     if (!isGetSubjNameSuccess) return;
@@ -238,7 +172,7 @@ export const SortedSubjTable = ({ rows }) => {
         </TableHead>
         <TableBody>
           {campaigns &&
-            campaigns.map((row, index) => <Row key={index} row={row} />)}
+            campaigns.filter(item => item.subjName.toLowerCase().includes(text.toLowerCase())).map((row, index) => <Row key={index} row={row} />)}
         </TableBody>
       </Table>
 
